@@ -47,7 +47,7 @@ export class WebMediatorClient
 {
     constructor(endpointUrl, requestInit) {
         this._endpointUrl = endpointUrl;
-        this._requestInit = requestInit;
+        this._requestInit = requestInit ?? {};
 
         if(endpointUrl[endpointUrl.length-1] != '/')
             this._endpointUrl=this._endpointUrl+'/';
