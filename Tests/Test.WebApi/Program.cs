@@ -8,6 +8,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 builder.Services.AddTransient<IRequestHandler<FileUpload<FileMetadata>, FileUploadResult<FileMetadata>>, FileUploadHandler<FileMetadata>>();
 
+builder.Services.AddOpenApi("v1");
+builder.Services.AddCors();
+
 builder.WebHost.ConfigureKestrel(options =>
 {
     options.Limits.MaxRequestBodySize = long.MaxValue;
@@ -34,5 +37,7 @@ app.MapMediator("sapi", async (x) =>
 });
 
 app.MapGet("/", () => Results.Stream(File.OpenRead(@".\files\test.html"), "text/html; charset=utf-8"));
+app.MapOpenApi();
+app.UseCors(x => x.SetIsOriginAllowed(_ => true).AllowCredentials().AllowAnyHeader());
 
 app.Run();

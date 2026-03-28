@@ -4,8 +4,8 @@ A universal WebApi endpoint for any mediators.
 
 ## Features
 * Suitable for any mediators
-* Generics support
 * In/out file streams support
+* Generics support
 
 
 ## Example 1: WebMediator with MediatR
@@ -55,29 +55,63 @@ POST /mediator/Ping
 {"Message":"TEST PONG"}
 ```
 
+## Example 3: .NET client
+*.NET CLI*
+```
+dotnet new console --name "WebMediatorClientExample"
+cd WebMediatorClientExample
+dotnet add package WebMediator.Client
+```
 
-## Example 3: Generics requests
+*Program.cs:*
 ```C#
-app.MapMediator("mediator", 
-    // existing generic types will suffice for this example
-    cfg => cfg.RegisterTypes([typeof(List<>), typeof(Dictionary<,>)]),
-    // for simplicity, return the received data
-    ctx => ctx.ReadData()); 
+using WebMediator.Client;
+
+// create client
+using var client = new WebMediatorClient("https://localhost:7263/mediator");
+
+// send request
+var response = await client.Send(new Ping { Message = "TEST" });
+
+Console.WriteLine(response.Message);
 ```
 
-*Request #1: Equivalent of List\<String>*
+*Console output:*
 ```
-POST /mediator/List(String)
-["text1","text2","text3"]
-```
-
-*Request #2: Equivalent of Dictionary<string,int?[]>*
-```
-POST /mediator/Dictionary(String-Array(Nullable(Int32)))
-{"key1":[555,null,777]}
+TEST PONG
 ```
 
-## Example 4: File upload
+[Example project...](https://github.com/mustaddon/WebMediator/tree/main/Examples/Example.Client)
+
+
+## Example 4: JavaScript client
+*NPM CLI*
+```
+npm i web-mediator-client
+```
+
+*JS*
+```js
+import { WebMediatorClient } from 'web-mediator-client';
+
+
+const client = new WebMediatorClient('https://localhost:7263/mediator');
+
+let response = await client.send('Ping', { Message: 'TEXT' });
+
+console.log(response.data);
+```
+
+*Console output:*
+```
+{"Message":"TEST PONG"}
+```
+
+[JS Project...](https://github.com/mustaddon/WebMediator/tree/main/WebMediator.Client.JavaScript)
+
+
+
+## Example 5: File upload
 *Create RequestHandler*
 ```C#
 public class FileUpload : MediatR.IRequest
@@ -99,43 +133,45 @@ public class FileUploadHandler : MediatR.IRequestHandler<FileUpload>
 
 *Sending a file in JavaScript*
 ```js
+import { WebMediatorClient } from 'web-mediator-client';
+
+
+const client = new WebMediatorClient('https://localhost:7263/mediator');
+
 let file = document.getElementById('my-input').files[0];
-let additionalData = { Name: file.name };
-let response = await fetch(`/mediator/FileUpload?data=${encodeURIComponent(JSON.stringify(additionalData))}`, {
-    method: 'POST',
-    body: file,
-});
+
+let response = await client.send('FileUpload', { Name: file.name, Content: file });
 ```
 
-[Example project...](https://github.com/mustaddon/WebMediator/tree/main/Examples/Example.MediatR)
+[Example project...](https://github.com/mustaddon/WebMediator/tree/main/WebMediator.Client.JavaScript/test.js)
 
 
 
-## Example 5: .NET client
-*.NET CLI*
-```
-dotnet new console --name "WebMediatorClientExample"
-cd WebMediatorClientExample
-dotnet add package WebMediator.Client
-```
 
-*Program.cs:*
+## Example 6: Generics requests
 ```C#
-using WebMediator.Client;
-
-// create client
-using var client = new WebMediatorClient("https://localhost:7263/mediator");
-
-// send request
-var response = await client.Send(new Ping { Message = "TEST" });
-
-Console.WriteLine(response?.Message);
+app.MapMediator("mediator", 
+    // existing generic types will suffice for this example
+    cfg => cfg.RegisterTypes([typeof(List<>), typeof(Dictionary<,>)]),
+    // for simplicity, return the received data
+    ctx => ctx.ReadData()); 
 ```
 
-*Console output:*
+*Request #1: Equivalent of List\<String>*
 ```
-TEST PONG
+POST /mediator/List(String)
+["text1","text2","text3"]
 ```
 
-[Example project...](https://github.com/mustaddon/WebMediator/tree/main/Examples/Example.Client)
+*Request #2: Equivalent of Dictionary<string,int?[]>*
+```
+POST /mediator/Dictionary(String-Array(Nullable(Int32)))
+{"key1":[555,null,777]}
+```
+
+
+
+
+
+
 
