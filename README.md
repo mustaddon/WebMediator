@@ -98,7 +98,7 @@ import { WebMediatorClient } from 'web-mediator-client';
 
 const client = new WebMediatorClient('https://localhost:7263/mediator');
 
-let response = await client.send('Ping', { Message: 'TEXT' });
+let response = await client.send('Ping', { Message: 'TEST' });
 
 console.log(response.data);
 ```
