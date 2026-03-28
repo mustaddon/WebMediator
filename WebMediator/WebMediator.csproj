@@ -1,0 +1,71 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+  	<TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
+  	<LangVersion>latest</LangVersion>
+  	<Nullable>enable</Nullable>
+  	<ImplicitUsings>enable</ImplicitUsings>
+    <SignAssembly>True</SignAssembly>
+  	<AssemblyOriginatorKeyFile>..\WebMediator.snk</AssemblyOriginatorKeyFile>
+  	<AssemblyVersion>0.9.0</AssemblyVersion>
+  	<FileVersion>0.9.0</FileVersion>
+  	<Version>0.9.0</Version>
+  	<Company></Company>
+  	<Authors>Leonid Salavatov</Authors>
+  	<Copyright>Leonid Salavatov 2026</Copyright>
+  	<PackageId>WebMediator</PackageId>
+  	<Product>WebMediator</Product>
+  	<Title>WebMediator</Title>
+  	<Description>A universal WebApi endpoint for any mediators.</Description>
+  	<PackageTags>mediator cqrs mediatr webapi endpoint minimal-api rest-api</PackageTags>
+  	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+  	<PackageProjectUrl>https://github.com/mustaddon/WebMediator</PackageProjectUrl>
+  	<RepositoryUrl>https://github.com/mustaddon/WebMediator</RepositoryUrl>
+  	<RepositoryType>git</RepositoryType>
+  	<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+  	<PackageLicenseExpression>MIT</PackageLicenseExpression>
+  	<NeutralLanguage />
+  	<PackageReleaseNotes></PackageReleaseNotes>
+  </PropertyGroup>
+  
+  <ItemGroup>
+	<PackageReference Include="TypeSerialization" Version="1.3.0" />
+  </ItemGroup>
+	
+  <PropertyGroup>
+  	<AspNetCoreRef Condition="'$(TargetFramework)' == 'net8.0'">C:\Program Files\dotnet\packs\Microsoft.AspNetCore.App.Ref\8.0.25\ref\net8.0</AspNetCoreRef>
+  	<AspNetCoreRef Condition="'$(TargetFramework)' == 'net9.0'">C:\Program Files\dotnet\packs\Microsoft.AspNetCore.App.Ref\9.0.14\ref\net9.0</AspNetCoreRef>
+  	<AspNetCoreRef Condition="'$(TargetFramework)' == 'net10.0'">C:\Program Files\dotnet\packs\Microsoft.AspNetCore.App.Ref\10.0.4\ref\net10.0</AspNetCoreRef>
+  </PropertyGroup>
+	
+  <ItemGroup>
+	<Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions">
+      <HintPath>$(AspNetCoreRef)\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
+	</Reference>
+    <Reference Include="Microsoft.AspNetCore.Http.Abstractions">
+      <HintPath>$(AspNetCoreRef)\Microsoft.AspNetCore.Http.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Http.Features">
+      <HintPath>$(AspNetCoreRef)\Microsoft.AspNetCore.Http.Features.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Http.Results">
+      <HintPath>$(AspNetCoreRef)\Microsoft.AspNetCore.Http.Results.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Net.Http.Headers">
+      <HintPath>$(AspNetCoreRef)\Microsoft.Net.Http.Headers.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Routing">
+      <HintPath>$(AspNetCoreRef)\Microsoft.AspNetCore.Routing.dll</HintPath>
+    </Reference>
+	  <Reference Include="Microsoft.AspNetCore.Cors">
+		  <HintPath>$(AspNetCoreRef)\Microsoft.AspNetCore.Cors.dll</HintPath>
+	  </Reference>
+    <Reference Include="Microsoft.Extensions.Primitives">
+      <HintPath>$(AspNetCoreRef)\Microsoft.Extensions.Primitives.dll</HintPath>
+    </Reference>
+	<Reference Include="System.IO.Pipelines" Condition="'$(TargetFramework)' == 'net8.0'">
+		<HintPath>$(AspNetCoreRef)\System.IO.Pipelines.dll</HintPath>
+	</Reference>
+  </ItemGroup>
+
+</Project>

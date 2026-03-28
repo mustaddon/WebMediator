@@ -1,0 +1,14 @@
+﻿{
+  "profiles": {
+    "Example.MediatR": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": true,
+      "launchUrl": "mediator/Ping?data={\"Message\":\"TEST\"}",
+      "applicationUrl": "https://localhost:7263;http://localhost:5263",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}

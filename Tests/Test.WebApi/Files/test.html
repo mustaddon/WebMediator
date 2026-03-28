@@ -1,0 +1,56 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+</head>
+<body>
+    <input id="file" type="file" onchange="onFileChange(this)" />
+    <br/>
+    <input id="stream" type="file" onchange="onStreamChange(this)" />
+
+    <script>
+        async function onFileChange(e) {
+            if (!e.files.length)
+                return;
+
+            const file = e.files[0];
+            console.log('selected:', file);
+            window['TEST_REQ'] = file;
+
+            let data = {
+                Name: file.name,
+                Metadata: {
+                    User: 'Tester',
+                    Date: new Date(),
+                }
+            };
+            let r = await fetch(`/mediatr/FileUpload(FileMetadata)?data=${encodeURIComponent(JSON.stringify(data))}`, {
+                method: 'POST',
+                body: file,
+            });
+            window['TEST_RES'] = r;
+
+            console.log('result:', await r.json());
+        }
+
+        async function onStreamChange(e) {
+            if (!e.files.length)
+                return;
+
+            const file = e.files[0];
+            console.log('selected:', file);
+            window['TEST_REQ'] = file;
+            console.log(file instanceof Blob);
+            
+
+            let r = await fetch('/sapi/Stream', {
+                method: 'POST',
+                body: file,
+            });
+
+            console.log('result:', await r.text());
+        }
+    </script>
+</body>
+</html>

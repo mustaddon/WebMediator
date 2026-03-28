@@ -1,0 +1,33 @@
+{
+  "version": "0.9.0",
+  "name": "web-mediator-client",
+  "description": "WebMediator API client",
+  "keywords": [
+    "webmediator",
+    "mediator",
+    "cqrs",
+    "mediator-client",
+    "api-client"
+  ],
+  "author": "Leonid Salavatov <mustaddon@gmail.com>",
+  "license": "MIT",
+  "main": "./index.js",
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "README.md",
+    "LICENSE"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mustaddon/webmediator.git",
+    "directory": "webmediator.client.javascript"
+  },
+  "scripts": {
+    "dev": "lite-server",
+    "deploy": "npm publish --access public"
+  },
+  "devDependencies": {
+    "lite-server": "^2.6.1"
+  }
+}
