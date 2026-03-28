@@ -1,4 +1,4 @@
-# WebMediator [![NuGet version](https://badge.fury.io/nu/WebMediator.svg)](http://badge.fury.io/nu/WebMediator)
+# WebMediator [![NuGet version](https://badge.fury.io/nu/WebMediator.svg?1)](http://badge.fury.io/nu/WebMediator)
 A universal WebApi endpoint for any mediators.
 
 

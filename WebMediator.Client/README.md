@@ -1,4 +1,4 @@
-# WebMediatorClient [![NuGet version](https://badge.fury.io/nu/WebMediator.Client.svg)](http://badge.fury.io/nu/WebMediator.Client)
+# WebMediatorClient [![NuGet version](https://badge.fury.io/nu/WebMediator.Client.svg?1)](http://badge.fury.io/nu/WebMediator.Client)
 .NET client for the WebMediator API
 
 
