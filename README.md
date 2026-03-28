@@ -5,7 +5,8 @@ A universal WebApi endpoint for any mediators.
 ## Features
 * Suitable for any mediators
 * In/out file streams support
-* Generics support
+* Generics request types support
+* Ready-to-use API clients in JavaScript and .NET
 
 
 ## Example 1: WebMediator with MediatR
