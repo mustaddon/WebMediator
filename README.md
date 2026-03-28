@@ -168,10 +168,3 @@ POST /mediator/List(String)
 POST /mediator/Dictionary(String-Array(Nullable(Int32)))
 {"key1":[555,null,777]}
 ```
-
-
-
-
-
-
-
