@@ -1,14 +1,20 @@
-# web-mediator-client [![npm version](https://badge.fury.io/js/web-mediator-client.svg)](https://www.npmjs.com/package/web-mediator-client)
-WebMediator API client
+# web-mediator-client [![npm version](https://badge.fury.io/js/web-mediator-client.svg?1)](https://www.npmjs.com/package/web-mediator-client)
+JavaScript client for the WebMediator API.
 
 
+*JS:*
 ```js
 import { WebMediatorClient } from 'web-mediator-client';
 
 
 const client = new WebMediatorClient('https://localhost:7263/mediator');
 
-let res = await client.send('Ping', { Message: 'TEXT' });
+let response = await client.send('Ping', { Message: 'TEXT' });
 
-console.log(res);
+console.log(response.data);
+```
+
+*Console output:*
+```
+{"Message":"TEST PONG"}
 ```

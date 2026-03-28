@@ -1,5 +1,5 @@
-# WebMediator Client [![NuGet version](https://badge.fury.io/nu/WebMediator.Client.svg)](http://badge.fury.io/nu/WebMediator.Client)
-WebMediator API client
+# WebMediatorClient [![NuGet version](https://badge.fury.io/nu/WebMediator.Client.svg)](http://badge.fury.io/nu/WebMediator.Client)
+.NET client for the WebMediator API
 
 
 ## Usage
@@ -20,7 +20,7 @@ using var client = new WebMediatorClient("https://localhost:7263/mediator");
 // send request
 var response = await client.Send(new Ping { Message = "TEST" });
 
-Console.WriteLine(response?.Message);
+Console.WriteLine(response.Message);
 ```
 
 *Console output:*

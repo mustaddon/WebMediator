@@ -7,16 +7,16 @@
   	<ImplicitUsings>enable</ImplicitUsings>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>..\WebMediator.snk</AssemblyOriginatorKeyFile>
-  	<AssemblyVersion>0.9.0</AssemblyVersion>
-  	<FileVersion>0.9.0</FileVersion>
-  	<Version>0.9.0</Version>
+  	<AssemblyVersion>1.0.0</AssemblyVersion>
+  	<FileVersion>1.0.0</FileVersion>
+  	<Version>1.0.0</Version>
 	<Company></Company>
     <Authors>Leonid Salavatov</Authors>
     <Copyright>Leonid Salavatov 2026</Copyright>
     <PackageId>WebMediator.Client</PackageId>
     <Product>WebMediator.Client</Product>
     <Title>WebMediator.Client</Title>
-  	<Description>WebMediator client</Description>
+  	<Description>Client for the WebMediator API</Description>
   	<PackageTags>mediator mediatr cqrs endpoint client</PackageTags>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   	<PackageProjectUrl>https://github.com/mustaddon/WebMediator</PackageProjectUrl>
