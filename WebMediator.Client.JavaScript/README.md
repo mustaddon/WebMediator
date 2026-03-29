@@ -1,4 +1,4 @@
-# web-mediator-client [![npm version](https://badge.fury.io/js/web-mediator-client.svg?2)](https://www.npmjs.com/package/web-mediator-client)
+# web-mediator-client [![npm version](https://badge.fury.io/js/web-mediator-client.svg?3)](https://www.npmjs.com/package/web-mediator-client)
 JavaScript client for the WebMediator API.
 
 

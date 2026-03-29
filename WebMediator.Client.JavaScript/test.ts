@@ -1,4 +1,4 @@
-import { WebMediatorClient } from './index.js';
+import { WebMediatorClient } from './index';
 
 const client = new WebMediatorClient('https://localhost:7263/mediator');
 

@@ -55,6 +55,12 @@ export class WebMediatorClient
 
     getLink(type, data)
     {
+        if(!type)
+            throw new Error('The type must not be empty.');
+
+        if(data === undefined && typeof(type) != typeof(''))
+            return this.getLink(type.type, type.data);
+
         if(data === undefined)
             return `${this._endpointUrl}${type}`;
 
@@ -66,6 +72,12 @@ export class WebMediatorClient
 
     send(type, data) 
     {
+        if(!type)
+            throw new Error('The type must not be empty.');
+
+        if(data === undefined && typeof(type) != typeof(''))
+            return this.send(type.type, type.data);
+
         if(data === undefined)
             return fetch(this._endpointUrl+type, {... this._requestInit, method: 'POST' }).then(getResult);
 
