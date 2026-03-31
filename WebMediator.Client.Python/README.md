@@ -1,6 +1,9 @@
 # webmediator
 Python sync/async client for the WebMediator API.
 
+```
+pip install webmediator
+```
 
 ## Example 1: request/response
 ```python

@@ -13,7 +13,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="webmediator",
-    version="1.0.0",
+    version="1.0.1",
     author="Leonid Salavatov",
     author_email="mustaddon@gmail.com",
     description="Python sync/async client for the WebMediator API",
