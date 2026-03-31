@@ -57,16 +57,14 @@ POST /mediator/Ping
 ```
 
 ## Example 3: .NET client
-*.NET CLI*
 ```
-dotnet new console --name "WebMediatorClientExample"
-cd WebMediatorClientExample
 dotnet add package WebMediator.Client
 ```
 
 *Program.cs:*
 ```C#
 using WebMediator.Client;
+
 
 // create client
 using var client = new WebMediatorClient("https://localhost:7263/mediator");
