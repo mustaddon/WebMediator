@@ -98,7 +98,25 @@ console.log(response.data);
 [JS Project...](https://github.com/mustaddon/WebMediator/tree/main/WebMediator.Client.JavaScript)
 
 
-## Example 5: File upload
+## Example 5: Python client
+```
+pip install webmediator
+```
+
+*code*
+```python
+import webmediator
+
+client = webmediator.Client('https://localhost:7263/mediator')
+
+response = client.send('Ping', {'Message':'EXAMPLE' })
+print(response)
+```
+
+[Python Project...](https://github.com/mustaddon/WebMediator/tree/main/WebMediator.Client.Python)
+
+
+## Example 6: File upload
 *Create RequestHandler*
 ```C#
 public class FileUpload : MediatR.IRequest
@@ -135,7 +153,7 @@ let response = await client.send('FileUpload', { Name: file.name, Content: file 
 
 
 
-## Example 6: Generics requests
+## Example 7: Generics requests
 ```C#
 app.MapMediator("mediator", 
     // existing generic types will suffice for this example
