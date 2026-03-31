@@ -6,7 +6,7 @@ A universal WebApi endpoint for any mediators.
 * Suitable for any mediators
 * In/out file streams support
 * Generics request types support
-* Ready-to-use API clients in JavaScript and .NET
+* Ready-to-use API clients: .NET, JavaScript, Python
 
 
 ## Example 1: WebMediator with MediatR
@@ -86,7 +86,6 @@ TEST PONG
 
 
 ## Example 4: JavaScript client
-*NPM CLI*
 ```
 npm i web-mediator-client
 ```
@@ -109,7 +108,6 @@ console.log(response.data);
 ```
 
 [JS Project...](https://github.com/mustaddon/WebMediator/tree/main/WebMediator.Client.JavaScript)
-
 
 
 ## Example 5: File upload
