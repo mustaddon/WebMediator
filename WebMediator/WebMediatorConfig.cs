@@ -4,6 +4,8 @@ public sealed class WebMediatorConfig
 {
     public bool CreatingInstancesOnEmptyRequests { get; set; } = true;
 
+    public Func<HttpContext, IResult>? ReturnOnUnregisteredDataType { get; set; }
+
     public TypeDeserializer? TypeDeserializer { get; set; }
 
     public JsonSerializerOptions JsonSerialization { get; set; } = new()
@@ -17,12 +19,6 @@ public sealed class WebMediatorConfig
     public WebMediatorConfig DisableCreatingInstancesOnEmptyRequests(bool disable = true)
     {
         CreatingInstancesOnEmptyRequests = !disable;
-        return this;
-    }
-
-    public WebMediatorConfig SetTypeDeserializer(TypeDeserializer deserializer)
-    {
-        TypeDeserializer = deserializer;
         return this;
     }
 

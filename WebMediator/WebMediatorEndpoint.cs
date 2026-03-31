@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
-using TypeSerialization.Json;
+﻿using TypeSerialization.Json;
 
 namespace WebMediator;
 
@@ -8,22 +7,33 @@ public class WebMediatorEndpoint
     public WebMediatorEndpoint(WebMediatorDelegate handler, WebMediatorConfig config)
     {
         _handler = handler;
-        _typeDeserializer = config.TypeDeserializer ?? TypeDeserializer.Default;
-        _jsonOptions = config.JsonSerialization;
-        _fillEmptyRequests = config.CreatingInstancesOnEmptyRequests;
+        _config = config;
 
-        if (!_jsonOptions.Converters.Any(x => typeof(JsonTypeConverter).IsAssignableFrom(x.GetType())))
-            _jsonOptions.Converters.Add(new JsonTypeConverter(_typeDeserializer));
+        _typeDeserializer = config.TypeDeserializer ?? TypeDeserializer.Default;
+
+        if (!config.JsonSerialization.Converters.Any(x => typeof(JsonTypeConverter).IsAssignableFrom(x.GetType())))
+            config.JsonSerialization.Converters.Add(new JsonTypeConverter(_typeDeserializer));
     }
 
-    readonly bool _fillEmptyRequests;
+    readonly WebMediatorConfig _config;
     readonly WebMediatorDelegate _handler;
     readonly TypeDeserializer _typeDeserializer;
-    readonly JsonSerializerOptions _jsonOptions;
 
     public Task<IResult> Handler(HttpContext ctx, string type, string? data)
     {
-        var dataType = _typeDeserializer.Deserialize(type)!;
+        Type dataType;
+
+        try
+        {
+            dataType = _typeDeserializer.Deserialize(type)!;
+        }
+        catch
+        {
+            if (_config.ReturnOnUnregisteredDataType != null)
+                return Task.FromResult(_config.ReturnOnUnregisteredDataType(ctx));
+
+            throw;
+        }
 
         ctx.Response.Headers.AddNoCache();
         ctx.Response.Headers.AddExposedHeaders();
@@ -40,7 +50,7 @@ public class WebMediatorEndpoint
 
         if (!string.IsNullOrEmpty(json))
         {
-            var obj = JsonSerializer.Deserialize(json, type, _jsonOptions);
+            var obj = JsonSerializer.Deserialize(json, type, _config.JsonSerialization);
             streamProp?.SetValue(obj, await DeserializeBody(ctx, typeof(Stream)));
             return obj;
         }
@@ -62,12 +72,12 @@ public class WebMediatorEndpoint
 
         try
         {
-            return await JsonSerializer.DeserializeAsync(ctx.Request.Body, type, _jsonOptions, ctx.RequestAborted);
+            return await JsonSerializer.DeserializeAsync(ctx.Request.Body, type, _config.JsonSerialization, ctx.RequestAborted);
         }
         catch (JsonException ex)
         {
             if (ex.LineNumber == 0 && ex.BytePositionInLine == 0)
-                return _fillEmptyRequests ? type.CreateInstance() : null;
+                return _config.CreatingInstancesOnEmptyRequests ? type.CreateInstance() : null;
 
             throw;
         }
@@ -83,8 +93,8 @@ public class WebMediatorEndpoint
         if (value is IResult result)
         {
             ctx.Response.Headers.AddDataType(
-                result.TryGetJsonType(out var jsonType) 
-                    ? jsonType 
+                result.TryGetJsonType(out var jsonType)
+                    ? jsonType
                     : typeof(Stream));
 
             return result;
@@ -105,13 +115,13 @@ public class WebMediatorEndpoint
         if (streamProp != null && streamProp.GetValue(value) is Stream streamPropVal)
         {
             streamProp.SetValue(value, null);
-            ctx.Response.Headers.AddData(value, _jsonOptions);
+            ctx.Response.Headers.AddData(value, _config.JsonSerialization);
             ctx.Response.Headers.AddDataStreamProperty(streamProp.Name);
             streamProp.SetValue(value, streamPropVal);
             return Results.Stream(streamPropVal);
         }
 
-        return Results.Json(value, _jsonOptions);
+        return Results.Json(value, _config.JsonSerialization);
     }
 
 }

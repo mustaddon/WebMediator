@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using WebMediator;
 
 namespace Microsoft.AspNetCore.Builder;
@@ -27,7 +28,14 @@ public static class WebMediatorEndpointBuilder
 
     public static IEndpointConventionBuilder MapMediator(this IEndpointRouteBuilder builder, string route, WebMediatorConfig config, WebMediatorDelegate handler)
     {
-        var endpoint = new WebMediatorEndpoint(handler, config ?? new());
+        config ??= new();
+
+        if (config.ReturnOnUnregisteredDataType == null
+            && builder is WebApplication webApplication
+            && webApplication.Environment.IsProduction())
+            config.ReturnOnUnregisteredDataType = static ctx => Results.NotFound();
+
+        var endpoint = new WebMediatorEndpoint(handler, config);
         var group = builder.MapGroup(route);
         group.MapGet(PATTERN, endpoint.Handler);
         group.MapPost(PATTERN, endpoint.Handler);
