@@ -75,11 +75,6 @@ var response = await client.Send(new Ping { Message = "TEST" });
 Console.WriteLine(response.Message);
 ```
 
-*Console output:*
-```
-TEST PONG
-```
-
 [Example project...](https://github.com/mustaddon/WebMediator/tree/main/Examples/Example.Client)
 
 
@@ -98,11 +93,6 @@ const client = new WebMediatorClient('https://localhost:7263/mediator');
 let response = await client.send('Ping', { Message: 'TEST' });
 
 console.log(response.data);
-```
-
-*Console output:*
-```
-{"Message":"TEST PONG"}
 ```
 
 [JS Project...](https://github.com/mustaddon/WebMediator/tree/main/WebMediator.Client.JavaScript)
