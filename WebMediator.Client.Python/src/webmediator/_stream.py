@@ -17,6 +17,9 @@ class HttpStreamIO(io.RawIOBase):
 
     def readable(self):
         return True
+    
+    def getbuffer():
+        None
 
     def close(self):
         if not self.closed:

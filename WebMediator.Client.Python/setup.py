@@ -1,8 +1,8 @@
 # pip install httpx
 # pip install --upgrade setuptools wheel
-# python setup.py sdist bdist_wheel
 # pip install --upgrade twine
-## python -m twine upload dist/webmediator-0.9.2.tar.gz
+# python setup.py sdist bdist_wheel
+## python -m twine upload dist/webmediator-1.0.0.tar.gz
 
 
 import setuptools
@@ -13,7 +13,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="webmediator",
-    version="0.9.3",
+    version="1.0.0",
     author="Leonid Salavatov",
     author_email="mustaddon@gmail.com",
     description="Python sync/async client for the WebMediator API",

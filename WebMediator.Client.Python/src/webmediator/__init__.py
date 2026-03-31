@@ -1,16 +1,14 @@
-from ._client import *
-from ._client_async import *
-from ._client_base import *
-from ._stream import *
-from ._stream_async import *
+from ._client import Client
+from ._client_async import AsyncClient
+from ._client_base import Response
+from ._stream import HttpStreamIO
+from ._stream_async import AsyncHttpStreamIO
 
 __all__ = [
     "Client",
     "HttpStreamIO",
-
     "AsyncClient",
     "AsyncHttpStreamIO",
-
     "Response"
 ]
 
