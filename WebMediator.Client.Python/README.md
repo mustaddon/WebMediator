@@ -1,4 +1,4 @@
-# webmediator
+# webmediator [![PyPI version](https://badge.fury.io/py/webmediator.svg)](https://pypi.org/project/webmediator)
 Python sync/async client for the WebMediator API.
 
 ```
