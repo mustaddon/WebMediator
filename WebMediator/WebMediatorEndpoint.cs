@@ -29,8 +29,8 @@ public class WebMediatorEndpoint
         }
         catch
         {
-            if (_config.NotFoundTypeResult != null)
-                return _config.NotFoundTypeResult(ctx);
+            if (_config.TypeNotFoundResult != null)
+                return _config.TypeNotFoundResult(ctx);
 
             throw;
         }

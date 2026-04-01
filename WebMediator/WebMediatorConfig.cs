@@ -4,7 +4,7 @@ public sealed class WebMediatorConfig
 {
     public bool CreatingInstancesOnEmptyRequests { get; set; } = true;
 
-    public Func<HttpContext, Task<IResult>>? NotFoundTypeResult { get; set; }
+    public Func<HttpContext, Task<IResult>>? TypeNotFoundResult { get; set; }
 
     public TypeDeserializer? TypeDeserializer { get; set; }
 
