@@ -1,17 +1,18 @@
 ﻿using MediatR;
-using System.Reflection;
 namespace Example.MediatR.Handlers;
 
-public class FileUploadHandler : IRequestHandler<FileUpload, string>
+public class FileUploadHandler : IRequestHandler<FileUpload>
 {
-    public async Task<string> Handle(FileUpload request, CancellationToken cancellationToken)
+    public async Task Handle(FileUpload request, CancellationToken cancellationToken)
     {
-        var filePath = Path.GetFullPath(Path.Combine([
-            Path.GetDirectoryName(Assembly.GetExecutingAssembly()!.Location)!,
-            request.Name ?? throw new ArgumentNullException(nameof(request.Name))]));
-        using var fileStream = File.Create(filePath);
+        using var fileStream = File.Create(GetPath(request.Name));
+
         await request.Content.CopyToAsync(fileStream, cancellationToken);
-        return filePath;
+    }
+
+    internal static string GetPath(string filename)
+    {
+        return Path.Combine([AppContext.BaseDirectory, filename ?? throw new ArgumentNullException(nameof(filename))]);
     }
 }
 

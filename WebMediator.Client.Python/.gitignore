@@ -3,3 +3,4 @@ dist/
 .venv/
 .vscode/
 webmediator.egg-info/
+test.txt

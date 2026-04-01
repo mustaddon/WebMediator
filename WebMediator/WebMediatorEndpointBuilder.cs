@@ -30,10 +30,10 @@ public static class WebMediatorEndpointBuilder
     {
         config ??= new();
 
-        if (config.ReturnOnUnregisteredDataType == null
+        if (config.NotFoundTypeResult == null
             && builder is WebApplication webApplication
             && webApplication.Environment.IsProduction())
-            config.ReturnOnUnregisteredDataType = static ctx => Results.NotFound();
+            config.NotFoundTypeResult = static ctx => Task.FromResult(Results.NotFound());
 
         var endpoint = new WebMediatorEndpoint(handler, config);
         var group = builder.MapGroup(route);

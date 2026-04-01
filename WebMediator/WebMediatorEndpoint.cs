@@ -29,19 +29,16 @@ public class WebMediatorEndpoint
         }
         catch
         {
-            if (_config.ReturnOnUnregisteredDataType != null)
-                return Task.FromResult(_config.ReturnOnUnregisteredDataType(ctx));
+            if (_config.NotFoundTypeResult != null)
+                return _config.NotFoundTypeResult(ctx);
 
             throw;
         }
 
-        ctx.Response.Headers.AddNoCache();
-        ctx.Response.Headers.AddExposedHeaders();
-
-        return GetResult(ctx, _handler(new(
+        return GetResult(ctx, new WebMediatorRequest(
             httpContext: ctx,
             dataType: dataType,
-            dataGetter: (t) => DataGetter(ctx, t, data))));
+            dataGetter: (t) => DataGetter(ctx, t, data)));
     }
 
     async Task<object?> DataGetter(HttpContext ctx, Type type, string? json)
@@ -83,9 +80,13 @@ public class WebMediatorEndpoint
         }
     }
 
-    async Task<IResult> GetResult(HttpContext ctx, Task<object?> valueTask)
+    async Task<IResult> GetResult(HttpContext ctx, WebMediatorRequest request)
     {
-        var value = await valueTask;
+        ctx.Response.Headers.AddNoCache();
+
+        var value = await _handler(request);
+
+        ctx.Response.Headers.AddExposedHeaders();
 
         if (value == null)
             return Results.NoContent();

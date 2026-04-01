@@ -20,8 +20,7 @@
 			const file = e.target.files[0];
 			console.log('selected:', file);
 			
-			let res = await client.send('FileUpload', { Name: file.name, Content: file });
-			console.log(res);
+			await client.send('FileUpload', { Name: file.name, Content: file });
 		}
 	</script>
 </body>

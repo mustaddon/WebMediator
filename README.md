@@ -145,7 +145,7 @@ const client = new WebMediatorClient('https://localhost:7263/mediator');
 
 let file = document.getElementById('my-input').files[0];
 
-let response = await client.send('FileUpload', { Name: file.name, Content: file });
+await client.send('FileUpload', { Name: file.name, Content: file });
 ```
 
 [Example project...](https://github.com/mustaddon/WebMediator/tree/main/WebMediator.Client.JavaScript/test.js)

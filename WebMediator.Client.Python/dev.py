@@ -10,11 +10,10 @@ with mediator.send('Ping', {'Message':'TEST' }) as res1:
     print(res1)
 
 with open('test.txt') as file: 
-    with mediator.send('FileUpload', { 'Name': file.name, 'Content': file }) as res2:
-        print(res2)
+    mediator.send('FileUpload', { 'Name': file.name, 'Content': file })
 
-with mediator.send('FileDownload', { 'Path': res2.data }) as res3:
+with mediator.send('FileDownload', { 'Name': file.name }) as res3:
     print(res3, res3.data.read())
 
-with mediator.send('FileDownloadWithInfo', { 'Path': res2.data }) as res4:
+with mediator.send('FileDownloadWithInfo', { 'Name': file.name }) as res4:
     print(res4, res4.data['Content'].read())

@@ -13,13 +13,12 @@ async def main():
         print(res1)
 
     with open('test.txt') as file: 
-        async with await mediator.send('FileUpload', { 'Name': file.name, 'Content': file }) as res2:
-            print(res2)
+        await mediator.send('FileUpload', { 'Name': file.name, 'Content': file })
 
-    async with await mediator.send('FileDownload', { 'Path': res2.data }) as res3:
+    async with await mediator.send('FileDownload', { 'Name': file.name }) as res3:
         print(res3, await res3.data.aread())
 
-    async with await mediator.send('FileDownloadWithInfo', { 'Path': res2.data }) as res4:
+    async with await mediator.send('FileDownloadWithInfo', { 'Name': file.name }) as res4:
         print(res4, res4.data['Content'].read())
 
     
