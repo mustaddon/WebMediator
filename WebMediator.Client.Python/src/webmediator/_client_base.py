@@ -70,7 +70,7 @@ class Response:
         self.type = type
         self.data = data
         self.__stream_ref = stream_ref if isinstance(stream_ref, (HttpStreamIO, AsyncHttpStreamIO)) else None
-    
+
     def __enter__(self):
         return self
     
@@ -89,6 +89,7 @@ class Response:
     def close(self):
         if self.__stream_ref != None:
             self.__stream_ref.close()
+            self.__stream_ref = None
             
     async def aclose(self):
         if self.__stream_ref == None:
@@ -98,4 +99,6 @@ class Response:
             await self.__stream_ref.aclose()
         else:
             self.__stream_ref.close()
+        
+        self.__stream_ref = None
         
