@@ -1,41 +1,44 @@
-﻿using Microsoft.AspNetCore.Cors.Infrastructure;
+﻿using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using WebMediator;
 
 namespace Microsoft.AspNetCore.Builder;
 
 public static class WebMediatorEndpointBuilder
 {
-    public static IEndpointConventionBuilder MapMediator(this IEndpointRouteBuilder builder, Action<WebMediatorConfig> configurator, WebMediatorDelegate handler)
+    internal static WebMediatorConfig CreateConfig(IEndpointRouteBuilder builder)
     {
-        return MapMediator(builder, "mediator", configurator, handler);
-    }
+        var config = new WebMediatorConfig()
+        {
+            MemoryCache = builder.ServiceProvider.GetService<IMemoryCache>(),
+        };
 
-    public static IEndpointConventionBuilder MapMediator(this IEndpointRouteBuilder builder, string route, Action<WebMediatorConfig> configurator, WebMediatorDelegate handler)
-    {
-        var config = new WebMediatorConfig(); configurator(config);
-        return MapMediator(builder, route, config, handler);
-    }
-
-    public static IEndpointConventionBuilder MapMediator(this IEndpointRouteBuilder builder, string route, WebMediatorDelegate handler)
-    {
-        return MapMediator(builder, route,
-            cfg => cfg.RegisterNotAbstractTypesFromAssembly(Assembly.GetCallingAssembly()),
-            handler);
-    }
-
-    public static IEndpointConventionBuilder MapMediator(this IEndpointRouteBuilder builder, string route, WebMediatorConfig config, WebMediatorDelegate handler)
-    {
-        config ??= new();
+        var jsonOptions = builder.ServiceProvider.GetService<IOptions<JsonOptions>>()?.Value.SerializerOptions;
+        if (jsonOptions != null)
+            config.JsonSerialization = jsonOptions;
 
         if (config.TypeNotFoundResult == null
             && builder is WebApplication webApplication
             && webApplication.Environment.IsProduction())
             config.TypeNotFoundResult = static ctx => Task.FromResult(Results.NotFound());
 
-        var endpoint = new WebMediatorEndpoint(handler, config);
+        return config;
+    }
+
+    public static IEndpointConventionBuilder MapMediator(this IEndpointRouteBuilder builder, string route, Action<WebMediatorConfig> configurator, WebMediatorDelegate handler)
+    {
+        var config = CreateConfig(builder);
+        configurator(config);
+        return MapMediator(builder, route, config, handler);
+    }
+
+    internal static IEndpointConventionBuilder MapMediator(this IEndpointRouteBuilder builder, string route, WebMediatorConfig config, WebMediatorDelegate handler)
+    {
+        var endpoint = new WebMediatorEndpoint(handler, config ?? CreateConfig(builder));
         var group = builder.MapGroup(route);
         group.MapGet(PATTERN, endpoint.Handler);
         group.MapPost(PATTERN, endpoint.Handler);

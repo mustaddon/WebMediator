@@ -1,4 +1,6 @@
-﻿namespace WebMediator;
+﻿using Microsoft.Extensions.Caching.Memory;
+
+namespace WebMediator;
 
 public sealed class WebMediatorConfig
 {
@@ -8,12 +10,11 @@ public sealed class WebMediatorConfig
 
     public TypeDeserializer? TypeDeserializer { get; set; }
 
+    public IMemoryCache? MemoryCache { get; set; }
+
     public JsonSerializerOptions JsonSerialization { get; set; } = new()
     {
         PropertyNameCaseInsensitive = true,
-        ReferenceHandler = ReferenceHandler.IgnoreCycles,
-        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-        WriteIndented = false,
     };
 
     public WebMediatorConfig DisableCreatingInstancesOnEmptyRequests(bool disable = true)

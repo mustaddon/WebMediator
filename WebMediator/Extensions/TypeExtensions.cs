@@ -1,13 +1,9 @@
-﻿using System.Collections.Concurrent;
+﻿using System.Net.ServerSentEvents;
 
 namespace WebMediator.Extensions;
 
 public static class TypeExtensions
 {
-    internal static bool IsAttribute(this Type type) => typeof(Attribute).IsAssignableFrom(type);
-
-    internal static bool IsException(this Type type) => typeof(Exception).IsAssignableFrom(type);
-
     public static object? CreateInstance(this Type type)
     {
         if (type.IsAbstract)
@@ -26,18 +22,47 @@ public static class TypeExtensions
         return Activator.CreateInstance(type, new object?[ctorParams?.Length ?? 0]);
     }
 
-    internal static PropertyInfo? GetStreamProperty(this Type type)
-    {
-        if (type.IsAbstract)
-            return null;
+    internal static bool IsAttribute(this Type type) => typeof(Attribute).IsAssignableFrom(type);
 
-        return _typeStreamProps.GetOrAdd(type, k => type
-            .GetProperties()
-            .FirstOrDefault(x => x.CanRead
-                && x.CanWrite
-                && x.SetMethod?.IsStatic == false
-                && x.PropertyType == typeof(Stream)));
+    internal static bool IsException(this Type type) => typeof(Exception).IsAssignableFrom(type);
+
+    internal static Type ToAsyncEnumerableType(this Type type)
+    {
+        return typeof(IAsyncEnumerable<>).MakeGenericType(type);
     }
 
-    static readonly ConcurrentDictionary<Type, PropertyInfo?> _typeStreamProps = [];
+    internal static bool TryGetSseItemType(this Type type, out Type itemType)
+    {
+        if (type.IsGenericType && !type.IsGenericTypeDefinition && type.GetGenericTypeDefinition() == typeof(SseItem<>))
+        {
+            itemType = type.GetGenericArguments().FirstOrDefault()!;
+            return true;
+        }
+
+        itemType = default!;
+        return false;
+    }
+
+    internal static bool IsIAsyncEnumerable(this Type type)
+        => type.IsInterface
+        && type.IsGenericType
+        && !type.IsGenericTypeDefinition
+        && type.GetGenericTypeDefinition() == typeof(IAsyncEnumerable<>);
+
+    internal static Type? GetAsyncEnumerableItemType(this Type type)
+    {
+        if (type.IsIAsyncEnumerable())
+            return type.GetGenericArguments().FirstOrDefault();
+
+        return type.GetInterfaces()
+            .FirstOrDefault(x => x.IsGenericType && !type.IsGenericTypeDefinition
+                && x.GetGenericTypeDefinition() == typeof(IAsyncEnumerable<>))
+            ?.GetGenericArguments().FirstOrDefault();
+    }
+
+    internal static Type? GetAsyncEnumerableType(this Type type)
+    {
+        var item = type.GetAsyncEnumerableItemType();
+        return item == null ? null : typeof(IAsyncEnumerable<>).MakeGenericType(item);
+    }
 }

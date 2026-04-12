@@ -19,6 +19,23 @@ internal static class HttpExtensions
         return false;
     }
 
+    public static bool TryGetSseType(this IResult result, out Type sseType)
+    {
+        var type = result.GetType();
+        if (type.IsGenericType
+            && !type.IsGenericTypeDefinition
+            && type.GetGenericTypeDefinition() == typeof(ServerSentEventsResult<>))
+        {
+            sseType = type.GetGenericArguments()[0];
+            return true;
+        }
+
+        sseType = default!;
+        return false;
+    }
+
+    
+
     public static IHeaderDictionary AddDataType(this IHeaderDictionary headers, Type type)
     {
         headers[Headers.DATA_TYPE] = type.Serialize();

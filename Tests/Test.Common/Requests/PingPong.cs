@@ -10,5 +10,6 @@ namespace Test.Requests
     public class Pong
     {
         public string? Message { get; set; }
+        public string? TextProp { get; set; }
     }
 }

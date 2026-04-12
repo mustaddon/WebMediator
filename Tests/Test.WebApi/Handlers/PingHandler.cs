@@ -7,7 +7,7 @@ namespace Test.WebApi.Handlers
     {
         public Task<Pong> Handle(Ping request, CancellationToken cancellationToken)
         {
-            return Task.FromResult(new Pong { Message = request.Message + " PONG" });
+            return Task.FromResult(new Pong { Message = request.Message + " PONG тест" });
         }
     }
 }

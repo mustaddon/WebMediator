@@ -1,4 +1,5 @@
-﻿using TypeSerialization.Json;
+﻿using Microsoft.Extensions.Caching.Memory;
+using TypeSerialization.Json;
 
 namespace WebMediator;
 
@@ -8,16 +9,28 @@ public class WebMediatorEndpoint
     {
         _handler = handler;
         _config = config;
-
+        _cache = config.MemoryCache ?? StaticCache.Instance;
         _typeDeserializer = config.TypeDeserializer ?? TypeDeserializer.Default;
 
-        if (!config.JsonSerialization.Converters.Any(x => typeof(JsonTypeConverter).IsAssignableFrom(x.GetType())))
-            config.JsonSerialization.Converters.Add(new JsonTypeConverter(_typeDeserializer));
+        _jsonOptions = new(config.JsonSerialization)
+        {
+            ReferenceHandler = ReferenceHandler.IgnoreCycles,
+        };
+        _jsonOptions.Converters.TryAdd(new JsonTypeConverter(_typeDeserializer));
+
+        _jsonOptionsIndented = new(_jsonOptions)
+        {
+            WriteIndented = false,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+        };
     }
 
     readonly WebMediatorConfig _config;
     readonly WebMediatorDelegate _handler;
     readonly TypeDeserializer _typeDeserializer;
+    readonly JsonSerializerOptions _jsonOptions;
+    readonly JsonSerializerOptions _jsonOptionsIndented;
+    readonly IMemoryCache _cache;
 
     public Task<IResult> Handler(HttpContext ctx, string type, string? data)
     {
@@ -43,11 +56,11 @@ public class WebMediatorEndpoint
 
     async Task<object?> DataGetter(HttpContext ctx, Type type, string? json)
     {
-        var streamProp = type.GetStreamProperty();
+        var streamProp = _cache.GetStreamProperty(type);
 
         if (!string.IsNullOrEmpty(json))
         {
-            var obj = JsonSerializer.Deserialize(json, type, _config.JsonSerialization);
+            var obj = JsonSerializer.Deserialize(json, type, _jsonOptions);
             streamProp?.SetValue(obj, await DeserializeBody(ctx, typeof(Stream)));
             return obj;
         }
@@ -69,7 +82,7 @@ public class WebMediatorEndpoint
 
         try
         {
-            return await JsonSerializer.DeserializeAsync(ctx.Request.Body, type, _config.JsonSerialization, ctx.RequestAborted);
+            return await JsonSerializer.DeserializeAsync(ctx.Request.Body, type, _jsonOptions, ctx.RequestAborted);
         }
         catch (JsonException ex)
         {
@@ -94,9 +107,9 @@ public class WebMediatorEndpoint
         if (value is IResult result)
         {
             ctx.Response.Headers.AddDataType(
-                result.TryGetJsonType(out var jsonType)
-                    ? jsonType
-                    : typeof(Stream));
+                result.TryGetJsonType(out var jsonType) ? jsonType
+                : result.TryGetSseType(out var sseType) ? sseType.ToAsyncEnumerableType()
+                : typeof(Stream));
 
             return result;
         }
@@ -107,22 +120,30 @@ public class WebMediatorEndpoint
             return Results.Stream(stream);
         }
 
+        if (_cache.TryGetAsyncEnumerableItemType(value.GetType(), out var itemType, out var sseItemType))
+        {
+            ctx.Response.Headers.AddDataType((sseItemType ?? itemType).ToAsyncEnumerableType());
+            return Results.ServerSentEvents(value
+                .ToAsyncEnumerable(itemType, ctx.RequestAborted)
+                .ToSse(_jsonOptionsIndented, itemType, sseItemType != null, ctx.RequestAborted));
+        }
+
         var resultType = value.GetType();
 
         ctx.Response.Headers.AddDataType(resultType);
 
-        var streamProp = resultType.GetStreamProperty();
+        var streamProp = _cache.GetStreamProperty(resultType);
 
         if (streamProp != null && streamProp.GetValue(value) is Stream streamPropVal)
         {
             streamProp.SetValue(value, null);
-            ctx.Response.Headers.AddData(value, _config.JsonSerialization);
+            ctx.Response.Headers.AddData(value, _jsonOptionsIndented);
             ctx.Response.Headers.AddDataStreamProperty(streamProp.Name);
             streamProp.SetValue(value, streamPropVal);
             return Results.Stream(streamPropVal);
         }
 
-        return Results.Json(value, _config.JsonSerialization);
+        return Results.Json(value, _jsonOptions);
     }
 
 }

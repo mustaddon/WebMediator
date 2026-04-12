@@ -1,41 +1,64 @@
-﻿namespace WebMediator.Client;
+﻿using System.Net.ServerSentEvents;
+
+namespace WebMediator.Client;
 
 public static class WebMediatorClientExtensions
 {
-    public static Task Send(this IWebMediatorClient client, object? request, Type requestType, CancellationToken cancellationToken = default)
+    public static string GetUrl<TRequest>(this IWebMediatorClient client, TRequest? request = default)
     {
-        return client.Send(request,
+        return client.GetUrl(typeof(TRequest), request);
+    }
+
+
+
+    public static Task Send(this IWebMediatorClient client, Type requestType, object? request = null, CancellationToken cancellationToken = default)
+    {
+        return client.Send(
             requestType: requestType,
+            request: request,
             resultType: typeof(void),
             cancellationToken: cancellationToken);
     }
 
     public static Task Send(this IWebMediatorClient client, object request, CancellationToken cancellationToken = default)
     {
-        return client.Send(request ?? throw new ArgumentNullException(nameof(request)),
-            requestType: request.GetType(),
+        return client.Send(
+            requestType: request?.GetType() ?? throw new ArgumentNullException(nameof(request)),
+            request: request,
             resultType: typeof(void),
             cancellationToken: cancellationToken);
     }
 
     public static async Task<TResult?> Send<TResult>(this IWebMediatorClient client, object request, CancellationToken cancellationToken = default)
     {
-        var result = await client.Send(request ?? throw new ArgumentNullException(nameof(request)),
-            requestType: request.GetType(),
+        var result = await client.Send(
+            requestType: request?.GetType() ?? throw new ArgumentNullException(nameof(request)),
+            request: request,
             resultType: typeof(TResult),
             cancellationToken: cancellationToken);
 
         return (TResult?)result;
     }
 
-    public static async Task<TResult?> Send<TRequest, TResult>(this IWebMediatorClient client, TRequest? request, CancellationToken cancellationToken = default)
+    public static async Task<TResult?> Send<TRequest, TResult>(this IWebMediatorClient client, TRequest? request = default, CancellationToken cancellationToken = default)
     {
-        var result = await client.Send(request,
+        var result = await client.Send(
             requestType: typeof(TRequest),
+            request: request,
             resultType: typeof(TResult),
             cancellationToken: cancellationToken);
 
         return (TResult?)result;
+    }
+
+
+
+    public static IAsyncEnumerable<SseItem<TResult>> EventStream<TRequest, TResult>(this IWebMediatorClient client, TRequest? request = default, CancellationToken cancellationToken = default)
+    {
+        return client.EventStream<TResult>(
+            requestType: typeof(TRequest),
+            request: request,
+            cancellationToken: cancellationToken);
     }
 }
 
