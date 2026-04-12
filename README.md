@@ -4,8 +4,9 @@ A universal WebApi endpoint for any mediators.
 
 ## Features
 * Suitable for any mediators
-* In/out file streams support
 * Generics request types support
+* In/out file streams support
+* Server-sent events support
 * Ready-to-use API clients: .NET, JavaScript, Python
 
 
@@ -43,17 +44,17 @@ app.Run();
 
 *Request*
 ```
-GET /mediator/Ping?data={"Message":"TEST"}
+GET /mediator/Ping?data={"message":"TEST"}
 
 or
 
 POST /mediator/Ping
-{"Message":"TEST"}
+{"message":"TEST"}
 ```
 
 *Response*
 ```
-{"Message":"TEST PONG"}
+{"message":"TEST PONG"}
 ```
 
 ## Example 3: .NET client
