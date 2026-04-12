@@ -16,3 +16,25 @@ console.log(res3, await res3.data.text());
 
 let res4 = await client.send('FileDownloadWithInfo', { Name: 'test.txt' });
 console.log(res4, await res4.data.Content.text());
+
+
+
+let res5 = await client.send('ExampleAsyncEvents');
+console.log(res5);
+
+let i=0;
+for await (const item of res5.data) { 
+    console.log(item); 
+    if(i++ > 2) break; 
+}
+
+
+
+let asyncEvents = client.eventStream('ExampleAsyncEvents');
+console.log(asyncEvents);
+
+i=0;
+for await (const item of asyncEvents) { 
+    console.log(item); 
+    if(i++ > 5) break; 
+}

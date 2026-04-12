@@ -11,11 +11,15 @@ export declare class WebMediatorClient {
     private readonly _endpointUrl;
     private readonly _requestInit;
 
+    public getUrl(type: string) : string;
+    public getUrl(type: string, data?: any) : string;
+    public getUrl(request: WebMediatorRequest) : string;
+
     public send(type: string): Promise<WebMediatorResponse>;
     public send(type: string, data?: any): Promise<WebMediatorResponse>;
     public send(request: WebMediatorRequest): Promise<WebMediatorResponse>;
 
-    public getLink(type: string) : string;
-    public getLink(type: string, data?: any) : string;
-    public getLink(request: WebMediatorRequest) : string;
+    public eventStream(type: string): AsyncGenerator<MessageEvent>;
+    public eventStream(type: string, data?: any): AsyncGenerator<MessageEvent>;
+    public eventStream(request: WebMediatorRequest): AsyncGenerator<MessageEvent>;
 }
