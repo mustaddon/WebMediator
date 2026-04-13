@@ -15,7 +15,7 @@ const res3 = await client.send('FileDownload', { Name: 'test.txt' });
 console.log(res3, await res3.data.text());
 
 const res4 = await client.send('FileDownloadWithInfo', { Name: 'test.txt' });
-console.log(res4, await res4.data.Content.text());
+console.log(res4, await res4.data.content.text());
 
 
 
@@ -30,11 +30,11 @@ for await (const item of res5.data) {
 
 
 
-const asyncEvents = client.eventStream('ExampleAsyncEvents');
-console.log(asyncEvents);
-
-i=0;
-for await (const item of asyncEvents) { 
-    console.log(item); 
-    if(i++ > 5) break; 
+for await (const sse of client.eventStream('ExampleAsyncEvents')) { 
+    console.log(sse); 
 }
+
+
+
+// for await (const sse of client.eventStream('AsyncEventsSse', { type: 'test', ErrorIndex: 3 }))
+//     console.log(sse); 

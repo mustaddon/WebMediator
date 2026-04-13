@@ -1,14 +1,16 @@
 {
-  "version": "1.0.2",
+  "version": "1.0.4",
   "name": "web-mediator-client",
   "description": "Client for the WebMediator API",
   "keywords": [
     "webmediator",
     "mediator",
     "cqrs",
-    "server-sent-events",
     "mediator-client",
-    "api-client"
+    "api-client",
+    "server-sent-events",
+    "event-stream",
+    "sse"
   ],
   "author": "Leonid Salavatov <mustaddon@gmail.com>",
   "license": "MIT",

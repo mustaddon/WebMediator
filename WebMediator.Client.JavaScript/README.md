@@ -12,14 +12,14 @@ import { WebMediatorClient } from 'web-mediator-client';
 
 const client = new WebMediatorClient('https://localhost:7263/mediator');
 
-const response = await client.send('Ping', { Message: 'TEST' });
+const response = await client.send('Ping', { message: 'TEST' });
 
 console.log(response.data);
 ```
 
 *Console output:*
 ```
-{"Message":"TEST PONG"}
+{"message":"TEST PONG"}
 ```
 
 
@@ -35,9 +35,9 @@ const fileData = new Blob(["Hello, world!"], { type: "text/plain" });
 // OR 
 // fileData = document.getElementById('my-input').files[0];
 
-await client.send('FileUpload', { Name: 'example.txt', Content: fileData });
+await client.send('FileUpload', { name: 'example.txt', content: fileData });
 
-let response = await client.send('FileDownload', { Name: 'example.txt' });
+let response = await client.send('FileDownload', { name: 'example.txt' });
 console.log(response, await response.data.text());
 ```
 
@@ -51,7 +51,7 @@ const client = new WebMediatorClient('https://localhost:7263/mediator');
 
 const asyncEvents = client.eventStream('ExampleAsyncEvents');
 
-for await (const e of asyncEvents) { 
-    console.log(e); 
+for await (const sse of asyncEvents) { 
+    console.log(sse); 
 }
 ```

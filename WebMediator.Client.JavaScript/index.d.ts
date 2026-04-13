@@ -19,7 +19,7 @@ export declare class WebMediatorClient {
     public send(type: string, data?: any): Promise<WebMediatorResponse>;
     public send(request: WebMediatorRequest): Promise<WebMediatorResponse>;
 
-    public eventStream(type: string): AsyncGenerator<MessageEvent>;
-    public eventStream(type: string, data?: any): AsyncGenerator<MessageEvent>;
-    public eventStream(request: WebMediatorRequest): AsyncGenerator<MessageEvent>;
+    public eventStream(type: string): AsyncGenerator<MessageEvent, void, unknown>;
+    public eventStream(type: string, data?: any, reconnectionDelay?: number, reconnectionRetriesLimit?: number): AsyncGenerator<MessageEvent, void, unknown>;
+    public eventStream(request: WebMediatorRequest): AsyncGenerator<MessageEvent, void, unknown>;
 }
