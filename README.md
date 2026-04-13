@@ -245,7 +245,7 @@ public class AsyncItemsStreamHandler : IStreamRequestHandler<AsyncItemsStream, A
 }
 ```
 
-*adding IStreamRequest handling to the endpoint*
+*Adding IStreamRequest handling to the endpoint*
 ```C#
 app.MapMediator("mediator",
     // register possible request types
@@ -264,7 +264,7 @@ app.MapMediator("mediator",
             : mediatorSvc.CreateStream(request, ctx.CancellationToken);
     });
 ```
-[Example project...](https://github.com/mustaddon/WebMediator/tree/main/Examples/Example.MediatR)
+[Example code...](https://github.com/mustaddon/WebMediator/tree/main/Examples/Example.MediatR/Program.cs)
 
 
 *JavaScript*

@@ -21,8 +21,14 @@ async def main():
     async with await mediator.send('FileDownloadWithInfo', { 'name': file.name }) as res4:
         print(res4, res4.data['content'].read())
 
+    async with await mediator.send('AsyncItemsStream', { 'count': 3 }) as res5:
+        async for item in res5.data:
+            print(item)
+
     async for sse in mediator.event_stream('ExampleAsyncEvents'):
         print(sse)
+
+
 
     # async with await mediator.send('AsyncItems', { 'count': 5 }) as res5:
     #     print(res5)
