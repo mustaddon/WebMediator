@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 namespace Example.MediatR.Handlers;
 
 
-public class AsyncEventsStreamHandler : IStreamRequestHandler<ExampleAsyncEventsStream, ExampleEvent>
+public class ExampleEventsStreamHandler : IStreamRequestHandler<ExampleAsyncEventsStream, ExampleEvent>
 {
     public async IAsyncEnumerable<ExampleEvent> Handle(ExampleAsyncEventsStream request, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
