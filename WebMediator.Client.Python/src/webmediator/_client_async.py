@@ -10,6 +10,8 @@ from httpx._client import EventHook
 
 from ._client_base import BaseClient, Response
 from ._stream_async import AsyncHttpStreamIO
+from ._event_async import event_async
+from ._safe_try_async import safe_try
 
 
 class AsyncClient(BaseClient):
@@ -84,6 +86,9 @@ class AsyncClient(BaseClient):
         if res.status_code== 204:
             await res.aclose()
             return Response(data_type)
+        
+        if self._is_event_stream_ctype(res):
+            return Response(data_type, event_async(res, lambda sse: self._decode_json(sse.data)))
     
         if not self._is_json_ctype(res):
             streamProp = self._get_data_stream_property(res)
@@ -119,27 +124,53 @@ class AsyncClient(BaseClient):
             
             yield value
 
-
     async def send(self, type: str, data=None):
+        return await self._get_result(await self._send(type, data))
+    
+    async def _send(self, type: str, data=None):
         if data == None:
-            return await self._get_result(await self._post(type))
+            return await self._post(type)
         
         if self._is_stream(data):
-            return await self._get_result(
-                await self._post(type, content=self._stream_content_async(data)))
+            return await self._post(type, content=self._stream_content_async(data))
         
         io_prop = self._get_stream_prop(data)
 
         if io_prop:
             copy = data.copy()
             del copy[io_prop]
-            return await self._get_result(
-                await self._post(f"{type}?data={self._encode_json(copy)}", 
-                    content=self._stream_content_async(data[io_prop])))
+            return await self._post(f"{type}?data={self._encode_json(copy)}", 
+                    content=self._stream_content_async(data[io_prop]))
 
-        return await self._get_result(
-            await self._post(type, json=data))
+        return await self._post(type, json=data)
     
     async def _post(self, url, json = None, content = None):
         req = self._client.build_request('POST', url, json=json, content=content)
         return await self._client.send(req, stream=True)
+    
+    async def event_stream(self, type: str, data=None, reconnection_delay = 3.0, reconnection_retries_limit: int | None = None):
+        reconnections = 0
+
+        while True:
+            (res, error) = await safe_try(lambda: self._send(type, data))
+
+            if error is None:
+                if not self._is_event_stream_ctype(res):
+                    await res.aclose()
+                    res.raise_for_status()
+                    raise httpx.HTTPError(f"The response does not contain 'text/event-stream'. (RequestURL: {res.url})") 
+                
+                generator = event_async(res, lambda sse:  self._convert_sse(sse))
+
+                while True:
+                    (sse, gerror) = await safe_try(lambda: anext(generator))
+                    if gerror is not None: break
+                    yield sse
+
+            if reconnection_retries_limit is not None and reconnections >= reconnection_retries_limit:
+                raise error if res is None else TypeError(f"The limit on the number of reconnection attempts has been reached. (RequestURL: {res.url})") 
+
+            if reconnection_delay > 0:
+                await asyncio.sleep(reconnection_delay) 
+            
+            reconnections += 1

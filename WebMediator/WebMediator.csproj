@@ -7,9 +7,9 @@
   	<ImplicitUsings>enable</ImplicitUsings>
     <SignAssembly>True</SignAssembly>
   	<AssemblyOriginatorKeyFile>..\WebMediator.snk</AssemblyOriginatorKeyFile>
-  	<AssemblyVersion>1.0.4</AssemblyVersion>
-  	<FileVersion>1.0.4</FileVersion>
-  	<Version>1.0.4</Version>
+  	<AssemblyVersion>1.0.5</AssemblyVersion>
+  	<FileVersion>1.0.5</FileVersion>
+  	<Version>1.0.5</Version>
   	<Company></Company>
   	<Authors>Leonid Salavatov</Authors>
   	<Copyright>Leonid Salavatov 2026</Copyright>
@@ -17,7 +17,7 @@
   	<Product>WebMediator</Product>
   	<Title>WebMediator</Title>
   	<Description>A universal WebApi endpoint for any mediators.</Description>
-  	<PackageTags>mediator cqrs mediatr webapi endpoint minimal-api rest-api</PackageTags>
+  	<PackageTags>mediator cqrs mediatr webapi endpoint rest-api event-stream server-sent-events sse</PackageTags>
   	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   	<PackageProjectUrl>https://github.com/mustaddon/WebMediator</PackageProjectUrl>
   	<RepositoryUrl>https://github.com/mustaddon/WebMediator</RepositoryUrl>

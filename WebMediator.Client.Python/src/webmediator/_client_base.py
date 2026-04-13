@@ -6,6 +6,7 @@ import httpx
     
 from ._stream import CHUNK_SIZE, HttpStreamIO
 from ._stream_async import AsyncHttpStreamIO
+from ._sse import ServerSentEvent
 
 class BaseClient:
     def __init__(self, endpoint_url: str):
@@ -13,6 +14,15 @@ class BaseClient:
 
     def _encode_json(self, obj):
         return quote(json.dumps(obj), safe='')
+    
+    def _decode_json(self, str: str):
+        return json.loads(str)
+    
+    def _convert_sse(self, sse: ServerSentEvent):
+        return ServerSentEvent(
+            type = sse.type, 
+            data = self._decode_json(sse.data), 
+            id = sse.last_event_id)
     
     def _is_stream(self, obj):
         return isinstance(obj, io.IOBase) or isinstance(obj, bytes)
@@ -41,6 +51,9 @@ class BaseClient:
         ctype = res.headers.get('content-type')
         return ctype != None and ctype.find('application/json') >= 0
 
+    def _is_event_stream_ctype(self, res: httpx.Response) -> bool:
+        return res.headers.get('content-type') == 'text/event-stream'
+
     def _get_data(self, res: httpx.Response):
         return json.loads(base64.b64decode(res.headers.get('data')))
 
@@ -50,7 +63,7 @@ class BaseClient:
     def _get_data_stream_property(self, res: httpx.Response) -> str | None:
         return res.headers.get('data-stream-property')
     
-    def get_link(self, type: str, data=None):
+    def get_url(self, type: str, data=None):
         if data == None:
             return self._endpoint_url+type
 

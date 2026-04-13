@@ -138,7 +138,7 @@ public class WebMediatorEndpoint
         {
             streamProp.SetValue(value, null);
             ctx.Response.Headers.AddData(value, _jsonOptionsIndented);
-            ctx.Response.Headers.AddDataStreamProperty(streamProp.Name);
+            ctx.Response.Headers.AddDataStreamProperty(streamProp.Name, _jsonOptionsIndented);
             streamProp.SetValue(value, streamPropVal);
             return Results.Stream(streamPropVal);
         }

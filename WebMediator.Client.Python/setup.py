@@ -2,7 +2,7 @@
 # pip install --upgrade setuptools wheel
 # pip install --upgrade twine
 # python setup.py sdist bdist_wheel
-## python -m twine upload dist/webmediator-1.0.0.tar.gz
+## python -m twine upload dist/webmediator-1.0.5.tar.gz
 
 
 import setuptools
@@ -13,14 +13,14 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="webmediator",
-    version="1.0.1",
+    version="1.0.5",
     author="Leonid Salavatov",
     author_email="mustaddon@gmail.com",
     description="Python sync/async client for the WebMediator API",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/mustaddon/webmediator.git",
-    keywords=["WebMediator", "CQRS", "Mediator", "ApiClient"],
+    keywords=["WebMediator", "CQRS", "Mediator", "ApiClient", "AsyncClient", "SSE", "ServerSentEvents", "EventStream"],
     packages=setuptools.find_packages(where='src'),
     package_dir={'': 'src'},
     classifiers=[

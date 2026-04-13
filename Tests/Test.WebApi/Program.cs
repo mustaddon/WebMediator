@@ -26,18 +26,19 @@ builder.WebHost.ConfigureKestrel(options =>
 
 var app = builder.Build();
 
-app.MapMediator("mediatr",
-    cfg => cfg
-        .RegisterNotAbstractTypesFromAssembly(typeof(Ping).Assembly)
-        .RegisterTypes([typeof(SseItem<>)]),
-    async x =>
-    {
-        var data = await x.ReadData();
-        var mediator = x.Services.GetRequiredService<IMediator>();
-        return typeof(IBaseRequest).IsAssignableFrom(x.DataType)
-            ? await mediator.Send(data, x.CancellationToken)
-            : mediator.CreateStream(data, x.CancellationToken);
-    });
+foreach (var route in new[] { "mediatr", "mediator", })
+    app.MapMediator(route,
+        cfg => cfg
+            .RegisterNotAbstractTypesFromAssembly(typeof(Ping).Assembly)
+            .RegisterTypes([typeof(SseItem<>)]),
+        async x =>
+        {
+            var data = await x.ReadData();
+            var mediator = x.Services.GetRequiredService<IMediator>();
+            return typeof(IBaseRequest).IsAssignableFrom(x.DataType)
+                ? await mediator.Send(data, x.CancellationToken)
+                : mediator.CreateStream(data, x.CancellationToken);
+        });
 
 app.MapMediator("sapi",
     cfg => cfg.RegisterNotAbstractTypesFromAssembly(Assembly.GetExecutingAssembly()),

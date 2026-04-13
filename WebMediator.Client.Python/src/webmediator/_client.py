@@ -81,6 +81,9 @@ class Client(BaseClient):
             res.close()
             return Response(data_type)
         
+        if self._is_event_stream_ctype(res):
+            raise TypeError("Please use the asynchronous client to receive server-sent events. The synchronous client does not support this.")
+        
         if not self._is_json_ctype(res):
             streamProp = self._get_data_stream_property(res)
 

@@ -42,9 +42,9 @@ internal static class HttpExtensions
         return headers;
     }
 
-    public static IHeaderDictionary AddDataStreamProperty(this IHeaderDictionary headers, string propName)
+    public static IHeaderDictionary AddDataStreamProperty(this IHeaderDictionary headers, string propName, JsonSerializerOptions options)
     {
-        headers[Headers.DATA_STREAM_PROPERTY] = propName;
+        headers[Headers.DATA_STREAM_PROPERTY] = options.PropertyNamingPolicy?.ConvertName(propName) ?? propName;
         return headers;
     }
 

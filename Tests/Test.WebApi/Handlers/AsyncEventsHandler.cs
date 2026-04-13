@@ -41,7 +41,10 @@ public class AsyncEventsSseHandler : MediatR.IStreamRequestHandler<AsyncEventsSs
             {
                 Type = request.Type,
                 Message = $"test: {index++}"
-            }, request.Type);
+            }, request.Type)
+            { 
+                EventId = index.ToString() 
+            };
 
             await Task.Delay(1000, cancellationToken);
         }
@@ -94,7 +97,10 @@ public class AsyncEventsRequestSseHandler : MediatR.IRequestHandler<AsyncEventsR
             yield return new(new(){
                 Type = request.Type,
                 Message = $"test: {index++}"
-            }, request.Type);
+            }, request.Type)
+            {
+                EventId = index.ToString()
+            };
 
             await Task.Delay(1000, cancellationToken);
         }

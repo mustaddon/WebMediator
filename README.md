@@ -91,7 +91,7 @@ import { WebMediatorClient } from 'web-mediator-client';
 
 const client = new WebMediatorClient('https://localhost:7263/mediator');
 
-let response = await client.send('Ping', { Message: 'TEST' });
+let response = await client.send('Ping', { message: 'TEST' });
 
 console.log(response.data);
 ```
@@ -110,7 +110,7 @@ import webmediator
 
 client = webmediator.Client('https://localhost:7263/mediator')
 
-response = client.send('Ping', {'Message':'EXAMPLE' })
+response = client.send('Ping', {'message':'EXAMPLE' })
 print(response)
 ```
 
@@ -146,7 +146,7 @@ const client = new WebMediatorClient('https://localhost:7263/mediator');
 
 let file = document.getElementById('my-input').files[0];
 
-await client.send('FileUpload', { Name: file.name, Content: file });
+await client.send('FileUpload', { name: file.name, content: file });
 ```
 
 [Example project...](https://github.com/mustaddon/WebMediator/tree/main/WebMediator.Client.JavaScript/test.js)
