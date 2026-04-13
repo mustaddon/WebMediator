@@ -9,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="MediatR.Contracts" Version="2.0.1" />
 	<PackageReference Include="Mediator.Abstractions" Version="3.0.2" />
+	<PackageReference Include="System.Net.ServerSentEvents" Version="10.0.5" />
   </ItemGroup>
 
 </Project>

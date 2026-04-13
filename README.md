@@ -174,3 +174,45 @@ POST /mediator/List(String)
 POST /mediator/Dictionary(String-Array(Nullable(Int32)))
 {"key1":[555,null,777]}
 ```
+
+
+
+## Example 8: Server-sent events
+*Create RequestHandler*
+```C#
+public class AsyncEventsHandler : IRequestHandler<ExampleAsyncEvents, IAsyncEnumerable<SseItem<string>>>
+{
+    public async Task<IAsyncEnumerable<SseItem<string>>> Handle(ExampleAsyncEvents request, CancellationToken cancellationToken)
+    {
+        return ExampleGenerator(request, cancellationToken);
+    }
+
+    async IAsyncEnumerable<SseItem<string>> ExampleGenerator(ExampleAsyncEvents request, [EnumeratorCancellation] CancellationToken cancellationToken)
+    {
+        int index = 0;
+
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            yield return new($"#{index++} example event", request.Type)
+            {
+                EventId = (index++).ToString()
+            };
+            await Task.Delay(1000, cancellationToken);
+        }
+    }
+}
+```
+
+*JavaScript*
+```js
+import { WebMediatorClient } from 'web-mediator-client';
+
+
+const client = new WebMediatorClient('https://localhost:7263/mediator');
+
+const asyncEvents = client.eventStream('ExampleAsyncEvents', { type: 'test' });
+
+for await (const sse of asyncEvents) { 
+    console.log(sse); 
+}
+```

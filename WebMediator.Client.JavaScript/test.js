@@ -19,7 +19,7 @@ console.log(res4, await res4.data.content.text());
 
 
 
-const res5 = await client.send('ExampleAsyncEvents');
+const res5 = await client.send('ExampleAsyncEventsStream');
 console.log(res5);
 
 let i=0;
@@ -30,7 +30,7 @@ for await (const item of res5.data) {
 
 
 
-for await (const sse of client.eventStream('ExampleAsyncEvents')) { 
+for await (const sse of client.eventStream('ExampleAsyncEvents', { type: 'test'})) { 
     console.log(sse); 
 }
 
