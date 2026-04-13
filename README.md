@@ -221,5 +221,68 @@ for await (const sse of asyncEvents) {
 // {type: 'test', data: '#0 example event', lastEventId: '0'}
 // {type: 'test', data: '#1 example event', lastEventId: '1'}
 // {type: 'test', data: '#2 example event', lastEventId: '2'}
+// {type: 'test', data: '#3 example event', lastEventId: '3'}
+```
+
+
+## Example 9: Async streams
+*Create RequestHandler*
+```C#
+public class AsyncItemsStreamHandler : IStreamRequestHandler<AsyncItemsStream, AsyncItem>
+{
+    public async IAsyncEnumerable<AsyncItem> Handle(AsyncItemsStream request, [EnumeratorCancellation] CancellationToken cancellationToken)
+    {
+        for (var i = 0; i < request.Count; i++)
+        {
+            yield return new()
+            {
+                Index = i,
+                Text = $"example async item #{i}"
+            };
+            await Task.Delay(1000, cancellationToken);
+        }
+    }
+}
+```
+
+*adding IStreamRequest handling to the endpoint*
+```C#
+app.MapMediator("mediator",
+    // register possible request types
+    cfg => cfg
+        .RegisterTypesAssignableTo<MediatR.IBaseRequest>(typeof(Ping).Assembly)
+        .RegisterTypes([typeof(ExampleAsyncEventsStream)]),
+
+    // handler with IStreamRequest and IRequest calls
+    async ctx =>
+    {
+        var request = await ctx.ReadData();
+        var mediatorSvc = ctx.Services.GetRequiredService<MediatR.IMediator>();
+
+        return typeof(MediatR.IBaseRequest).IsAssignableFrom(ctx.DataType)
+            ? await mediatorSvc.Send(request, ctx.CancellationToken)
+            : mediatorSvc.CreateStream(request, ctx.CancellationToken);
+    });
+```
+[Example project...](https://github.com/mustaddon/WebMediator/tree/main/Examples/Example.MediatR)
+
+
+*JavaScript*
+```js
+import { WebMediatorClient } from 'web-mediator-client';
+
+
+const client = new WebMediatorClient('https://localhost:7263/mediator');
+
+const response = await client.send('AsyncItemsStream', { count: 3 });
+
+for await (const item of response.data) { 
+    console.log(item); 
+}
+
+//// Console output:
+// {index: 0, text: 'example async item #0'}
+// {index: 1, text: 'example async item #1'}
+// {index: 2, text: 'example async item #2'}
 ```
 

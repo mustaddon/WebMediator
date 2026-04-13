@@ -19,13 +19,9 @@ console.log(res4, await res4.data.content.text());
 
 
 
-const res5 = await client.send('ExampleAsyncEventsStream');
-console.log(res5);
-
-let i=0;
+const res5 = await client.send('AsyncItemsStream', { count: 3 });
 for await (const item of res5.data) { 
     console.log(item); 
-    if(i++ > 2) break; 
 }
 
 

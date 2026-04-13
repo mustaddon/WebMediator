@@ -13,7 +13,7 @@ app.MapMediator("mediator",
     // register possible request types
     cfg => cfg
         .RegisterTypesAssignableTo<MediatR.IBaseRequest>(typeof(Ping).Assembly)
-        .RegisterTypes([typeof(ExampleAsyncEventsStream)]),
+        .RegisterTypes([typeof(AsyncItemsStream)]),
 
     // handler with a call to MediatR
     async ctx =>
