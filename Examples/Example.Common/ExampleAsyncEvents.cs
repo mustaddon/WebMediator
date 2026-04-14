@@ -6,5 +6,6 @@ namespace Example;
 public class ExampleAsyncEvents : MediatR.IRequest<IAsyncEnumerable<SseItem<string>>>
 {
     public string Type { get; set; }
+    public int? Delay { get; set; }
 }
 

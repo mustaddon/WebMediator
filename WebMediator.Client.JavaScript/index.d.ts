@@ -1,10 +1,3 @@
-export declare interface WebMediatorRequest { 
-    type: string,
-    data?: any,
-}
-
-export declare interface WebMediatorResponse extends WebMediatorRequest { }
-
 export declare class WebMediatorClient {
     constructor(endpointUrl: string, requestInit?: RequestInit | undefined);
 
@@ -16,10 +9,34 @@ export declare class WebMediatorClient {
     public getUrl(request: WebMediatorRequest) : string;
 
     public send(type: string): Promise<WebMediatorResponse>;
-    public send(type: string, data?: any): Promise<WebMediatorResponse>;
-    public send(request: WebMediatorRequest): Promise<WebMediatorResponse>;
+    public send(type: string, data?: any, options?: SendOptions): Promise<WebMediatorResponse>;
+    public send(request: WebMediatorRequest, options?: SendOptions): Promise<WebMediatorResponse>;
 
-    public eventStream(type: string): AsyncGenerator<MessageEvent, void, unknown>;
-    public eventStream(type: string, data?: any, reconnectionDelay?: number, reconnectionRetriesLimit?: number): AsyncGenerator<MessageEvent, void, unknown>;
-    public eventStream(request: WebMediatorRequest): AsyncGenerator<MessageEvent, void, unknown>;
+    public eventStream(type: string): AsyncGenerator<ServerSentEvent, void, unknown>;
+    public eventStream(type: string, data?: any, options?: EventStreamOptions): AsyncGenerator<ServerSentEvent, void, unknown>;
+    public eventStream(request: WebMediatorRequest, options?: EventStreamOptions): AsyncGenerator<ServerSentEvent, void, unknown>;
+}
+
+export interface WebMediatorRequest { 
+    type: string;
+    data?: any;
+}
+
+export interface WebMediatorResponse extends WebMediatorRequest { 
+
+}
+
+export interface SendOptions { 
+    signal?: AbortSignal;
+}
+
+export interface EventStreamOptions extends SendOptions { 
+    reconnectionDelay?: number;
+    reconnectionRetriesLimit?: number;
+}
+
+export interface ServerSentEvent { 
+    type: string;
+    data?: any;
+    lastEventId?: string;
 }

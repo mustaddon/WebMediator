@@ -15,7 +15,7 @@ public class AsyncItemsStreamHandler : IStreamRequestHandler<AsyncItemsStream, A
                 Index = i,
                 Text = $"example async item #{i}"
             };
-            await Task.Delay(1000, cancellationToken);
+            await Task.Delay(request.Delay ?? 1000, cancellationToken);
         }
     }
 }

@@ -20,7 +20,7 @@ public class ExampleEventsHandler : IRequestHandler<ExampleAsyncEvents, IAsyncEn
             {
                 EventId = index.ToString()
             };
-            await Task.Delay(1000, cancellationToken);
+            await Task.Delay(request.Delay ?? 1000, cancellationToken);
             index++;
         }
     }

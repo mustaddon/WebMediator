@@ -15,15 +15,15 @@ export class WebMediatorClient
     /**
      * @param {string} type
      * @param {any} [data]
+     * @param {SendOptions} [options]
      * @returns {string}
      */
     getUrl(type, data)
     {
-        if(!type)
-            throw new WebMediatorError('The type must not be empty.');
+        if(this.__hasRequestArgument(...arguments))
+            return this.getUrl(arguments[0].type, arguments[0].data);
 
-        if(data === undefined && typeof(type) != typeof(''))
-            return this.getUrl(type.type, type.data);
+        this.__checkArguments(...arguments);
 
         if(data === undefined)
             return `${this._endpointUrl}${type}`;
@@ -35,63 +35,97 @@ export class WebMediatorClient
     }
     
     /**
+     * @typedef {Object} EventStreamOptions
+     * @property {number} [reconnectionDelay]
+     * @property {number} [reconnectionRetriesLimit]
+     */
+    /**
      * @param {string} type
      * @param {any} [data]
-     * @param {number} [reconnectionDelay]
-     * @param {number} [reconnectionRetriesLimit]
+     * @param { SendOptions & EventStreamOptions } [options]
      * @returns {AsyncGenerator<MessageEvent, void, unknown>}
      */
-    eventStream(type, data, reconnectionDelay, reconnectionRetriesLimit)
+    eventStream(type, data, options)
     {
-        return eventStream(() => this.__send(type, data, 
-            (res, controller) => {
+        if(this.__hasRequestArgument(...arguments))
+            return this.eventStream(arguments[0].type, arguments[0].data, arguments[1], arguments[2]);
+
+        this.__checkArguments(...arguments);
+        
+        const controller = this.__createAbortController(options);
+
+        return eventStream(() => this.__send(type, data, controller.signal)
+            .then(res => {
                 if(res.headers.get('content-type') != 'text/event-stream')
                 {
                     controller.abort();
                     throw new SseError(`The response does not contain 'text/event-stream'. (RequestURL: ${res.url})`);
                 }
 
-                return eventStreamBase(res, controller);
-            }), { 
-                reconDelay: reconnectionDelay ?? 3000, 
-                reconRetries: reconnectionRetriesLimit
+                return eventStreamBase(res, this.__createAbortController(options));
+            }), {
+                reconnectionDelay: 3000,
+                ... options, 
+                signal: controller.signal
             });
     }
 
+
+    /**
+     * @typedef {Object} SendOptions
+     * @property {AbortSignal} [signal]
+     */
     /**
      * @param {string} type
      * @param {any} [data]
+     * @param {SendOptions} [options]
      * @returns {Promise}
      */
-    send(type, data) {
-        return this.__send(type, data, getResult);
+    send(type, data, options) {
+        if(this.__hasRequestArgument(...arguments))
+            return this.send(arguments[0].type, arguments[0].data, arguments[1], arguments[2]);
+
+        this.__checkArguments(...arguments);
+
+        const controller = this.__createAbortController(options);
+
+        return this.__send(type, data, controller.signal).then(r => getResult(r, controller));
     }
 
-    __send(type, data, next) 
-    {
-        if(!type)
-            throw new WebMediatorError('The type must not be empty.');
-
-        if(data === undefined && typeof(type) != typeof(''))
-            return this.__send(type.type, type.data);
-
+    __createAbortController(options){
         const controller = new AbortController();
+        if(options?.signal)
+            options.signal.addEventListener('abort', e => controller.abort(new AbortError(e.target.reason)));
+        return controller;
+    }
+
+    __checkArguments(type) {
+        if(!type) throw new WebMediatorError('The type must not be empty.');
+        return true;
+    }
+
+    __hasRequestArgument(type) {
+        return type && typeof(type) != typeof('') && typeof(type.type) == typeof('');
+    }
+
+    __send(type, data, signal) 
+    {
         const requestInit = {
             ... this._requestInit, 
-            signal: controller.signal, 
+            signal: signal, 
             method: 'POST' 
         };
 
-        const goNext = r => {
+        const checkStatus = r => {
             if(!r.ok) throw new WebMediatorError(`Response status is ${r.status}. (RequestUrl: ${r.url})`);
-            return next(r, controller)
+            return r;
         };
 
         if(data === undefined)
-            return fetch(this._endpointUrl+type, requestInit).then(goNext);
+            return fetch(this._endpointUrl+type, requestInit).then(checkStatus);
 
         if(data instanceof Blob)
-            return fetch(this._endpointUrl+type, { ... requestInit, body: data }).then(goNext);
+            return fetch(this._endpointUrl+type, { ... requestInit, body: data }).then(checkStatus);
 
         const blobProp = getBlobProperty(data);
 
@@ -103,19 +137,25 @@ export class WebMediatorClient
             return fetch(`${this._endpointUrl}${type}?data=${encodeURIComponent(JSON.stringify(copy))}`, {
                 ... requestInit,
                 body: data[blobProp]
-            }).then(goNext);
+            }).then(checkStatus);
         }
 
         return fetch(this._endpointUrl+type, {
             ... requestInit,
             body: JSON.stringify(data)
-        }).then(goNext);
+        }).then(checkStatus);
     }
 }
 
 export class WebMediatorError extends Error { }
 
 export class SseError extends WebMediatorError { }
+
+export class AbortError extends WebMediatorError { 
+    constructor(reason, options) {
+        super(reason?.message || reason || 'aborted without reason', options)
+    }
+}
 
 export default { WebMediatorClient };
 
@@ -195,7 +235,7 @@ async function safe(promiseFac) {
 
 /**
  * @param {function(): Promise<AsyncGenerator<MessageEvent>>} sseFactory
- * @param { ({reconDelay?: number, reconRetries?: number}) } options
+ * @param { SendOptions & EventStreamOptions } options
  * @returns {AsyncGenerator<MessageEvent>}
  */
 async function* eventStream(sseFactory, options){
@@ -212,16 +252,23 @@ async function* eventStream(sseFactory, options){
                 yield item.value.value;
             }
         }
-        else if(generator.error instanceof SseError)
+        else if(generator.error instanceof SseError || generator.error instanceof AbortError)
         {
             throw generator.error;
         }
+        else if(generator.error instanceof DOMException && ['AbortError', 'TimeoutError'].indexOf(generator.error.name) >= 0)
+        {
+            throw new AbortError(generator.error);
+        }
 
-        if(options?.reconRetries != null && reconnections >= options.reconRetries)
+        if(options.signal?.aborted)
+            throw new AbortError(options.signal.reason);
+
+        if(options.reconnectionRetriesLimit != null && reconnections >= options.reconnectionRetriesLimit)
             throw new SseError(`The limit on the number of reconnection attempts has been reached.`);
         
-        if(options?.reconDelay > 0)
-            await new Promise(resolve => setTimeout(resolve, options.reconDelay));
+        if(options.reconnectionDelay > 0)
+            await new Promise(resolve => setTimeout(resolve, options.reconnectionDelay));
 
         reconnections++;
     }

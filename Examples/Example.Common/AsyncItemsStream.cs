@@ -5,6 +5,7 @@ namespace Example;
 public class AsyncItemsStream : MediatR.IStreamRequest<AsyncItem>
 {
     public int Count { get; set; }
+    public int? Delay { get; set; }
 }
 
 public class AsyncItem
