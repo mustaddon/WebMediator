@@ -8,6 +8,8 @@ namespace Test.Requests
         public string? Message { get; set; }
 
         public int? Count { get; set; }
+
+        public int? Delay { get; set; }
     }
 
     public class AsyncItem

@@ -202,7 +202,7 @@ async function* eventStreamBase(response, controller) {
             if (done) break;
             
             const chunk = decoder.decode(value, { stream: true });
-            const sse = { type: 'message', data: null, lastEventId };
+            let sse = { type: 'message', data: undefined, lastEventId };
 
             for (let x of chunk.split('\n'))
                 if(x.startsWith('event: '))
@@ -211,8 +211,11 @@ async function* eventStreamBase(response, controller) {
                     sse.data = JSON.parse(x.substring(6));
                 else if(x.startsWith('id: '))
                     sse.lastEventId = lastEventId = x.substring(4);
-                
-            yield sse;
+                else if(!x && sse.data !== undefined)
+                {
+                    yield sse;
+                    sse = { type: 'message', data: undefined, lastEventId };
+                }
         }
     } finally {
         controller.abort();
