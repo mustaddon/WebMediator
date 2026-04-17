@@ -196,13 +196,13 @@ async function* eventStreamBase(response, controller) {
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
         let lastEventId = null;
+        let sse = { type: 'message', data: undefined, lastEventId };
         
         while (true) {
             const { value, done } = await reader.read();
             if (done) break;
             
             const chunk = decoder.decode(value, { stream: true });
-            let sse = { type: 'message', data: undefined, lastEventId };
 
             for (let x of chunk.split('\n'))
                 if(x.startsWith('event: '))
