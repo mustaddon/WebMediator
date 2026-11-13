@@ -6,8 +6,8 @@ public static class TypeExtensions
 {
     public static object? CreateInstance(this Type type)
     {
-        if (type.IsAbstract)
-            throw new InvalidOperationException($"Cannot create an instance of an abstract type '{type.Name}'.");
+        if (type.IsAbstract || type.IsInterface || type.ContainsGenericParameters)
+            throw new InvalidOperationException($"Cannot create an instance of type '{type}'.");
 
         if (type.IsArray)
             return Array.CreateInstance(type.GetElementType()!, 0);

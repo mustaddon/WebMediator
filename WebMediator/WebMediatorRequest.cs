@@ -1,6 +1,4 @@
-﻿using System.Collections.Concurrent;
-
-namespace WebMediator;
+﻿namespace WebMediator;
 
 public sealed class WebMediatorRequest
 {
@@ -12,7 +10,9 @@ public sealed class WebMediatorRequest
     }
 
     readonly Func<Type, Task<object?>> _dataGetter;
-    readonly ConcurrentDictionary<Type, Task<object?>> _dataTask = [];
+    readonly object _dataSync = new();
+    Type? _dataResultType;
+    Task<object?>? _dataTask;
 
     public Type DataType { get; }
 
@@ -24,10 +24,20 @@ public sealed class WebMediatorRequest
 
     public Task<object?> ReadDataAs(Type resultType)
     {
-        if (!_dataTask.IsEmpty && !_dataTask.ContainsKey(resultType))
-            throw new InvalidOperationException($"The request data was already read as '{_dataTask.Keys.First()}'.");
+        lock (_dataSync)
+        {
+            if (_dataTask != null)
+            {
+                if (_dataResultType != resultType)
+                    throw new InvalidOperationException($"The request data was already read as '{_dataResultType}'.");
 
-        return _dataTask.GetOrAdd(resultType, _dataGetter);
+                return _dataTask;
+            }
+
+            _dataResultType = resultType;
+            _dataTask = _dataGetter(resultType);
+            return _dataTask;
+        }
     }
 
     public HttpContext HttpContext { get; }

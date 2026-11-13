@@ -4,6 +4,7 @@ namespace Test.Client
     {
 
         [Test]
+        [Description("Verifies that arrays with null values are correctly reconstructed and retain the expected elements.")]
         public async Task TestArray()
         {
             var request = new int?[] { 555, null, 666 };
@@ -14,6 +15,7 @@ namespace Test.Client
         }
 
         [Test]
+        [Description("Verifies that generic list payloads are round-tripped with the same values and ordering.")]
         public async Task TestList()
         {
             var request = new List<int> { 111, 222, 333 };
@@ -24,6 +26,7 @@ namespace Test.Client
         }
 
         [Test]
+        [Description("Verifies that dictionary payloads keep the same keys and nested array values after serialization.")]
         public async Task TestDictionary()
         {
             var request = new Dictionary<string, int[]> {

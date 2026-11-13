@@ -3,6 +3,7 @@
     public partial class MediatR
     {
         [Test]
+        [Description("Verifies that a stream download returns the exact file content as expected.")]
         public async Task TestStreamDownload()
         {
             using var response = await _client.Send(new StreamRequest());
@@ -10,6 +11,7 @@
         }
 
         [Test]
+        [Description("Verifies that file metadata and content are returned correctly for downloaded files.")]
         public async Task TestFileDownload()
         {
             var response = await _client.Send(new FileRequest());
@@ -26,6 +28,7 @@
 
 
         [Test]
+        [Description("Verifies that uploaded files are saved and returned with the same content and metadata.")]
         public async Task TestFileUpload()
         {
             var requestContent = Encoding.UTF8.GetBytes(TestData.FileContent);

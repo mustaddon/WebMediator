@@ -80,16 +80,46 @@ public class WebMediatorEndpoint
         if (type == typeof(Stream))
             return new HttpStream(ctx.Request);
 
+        var body = ctx.Request.Body;
+        long? bodyStart = null;
+        if (ctx.Request.ContentLength is null)
+        {
+            ctx.Request.EnableBuffering();
+            body = ctx.Request.Body;
+            if (body.CanSeek)
+                bodyStart = body.Position;
+        }
+
         try
         {
-            return await JsonSerializer.DeserializeAsync(ctx.Request.Body, type, _jsonOptions, ctx.RequestAborted);
+            return await JsonSerializer.DeserializeAsync(body, type, _jsonOptions, ctx.RequestAborted);
         }
         catch (JsonException ex)
         {
-            if (ex.LineNumber == 0 && ex.BytePositionInLine == 0)
+            if (ex.LineNumber == 0 && ex.BytePositionInLine == 0
+                && await IsEmptyBody(ctx, body, bodyStart))
                 return _config.CreatingInstancesOnEmptyRequests ? type.CreateInstance() : null;
 
             throw;
+        }
+    }
+
+    static async Task<bool> IsEmptyBody(HttpContext ctx, Stream body, long? bodyStart)
+    {
+        if (ctx.Request.ContentLength == 0)
+            return true;
+
+        if (ctx.Request.ContentLength.HasValue || !bodyStart.HasValue)
+            return false;
+
+        body.Position = bodyStart.Value;
+        try
+        {
+            return await body.ReadAsync(new byte[1], ctx.RequestAborted) == 0;
+        }
+        finally
+        {
+            body.Position = bodyStart.Value;
         }
     }
 
@@ -106,10 +136,12 @@ public class WebMediatorEndpoint
 
         if (value is IResult result)
         {
-            ctx.Response.Headers.AddDataType(
-                result.TryGetJsonType(out var jsonType) ? jsonType
-                : result.TryGetSseType(out var sseType) ? sseType.ToAsyncEnumerableType()
-                : typeof(Stream));
+            if (result.TryGetJsonType(out var jsonType))
+                ctx.Response.Headers.AddDataType(jsonType);
+            else if (result.TryGetSseType(out var sseType))
+                ctx.Response.Headers.AddDataType(sseType.ToAsyncEnumerableType());
+            else if (result is IValueHttpResult valueResult && valueResult.Value is { } resultValue)
+                ctx.Response.Headers.AddDataType(resultValue.GetType());
 
             return result;
         }

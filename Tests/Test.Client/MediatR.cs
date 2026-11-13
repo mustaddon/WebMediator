@@ -11,6 +11,7 @@
         }
 
         [Test]
+        [Description("Verifies that a simple ping request returns a valid response with non-empty message data.")]
         public async Task TestPingPong()
         {
             var response = await _client.Send(new Ping { Message = "TEST" });
@@ -20,6 +21,7 @@
         }
 
         [Test]
+        [Description("Verifies that self-referencing loop requests are safely processed without preserving circular references.")]
         public async Task TestLoop()
         {
             var request = new Looped { Number = 666 };

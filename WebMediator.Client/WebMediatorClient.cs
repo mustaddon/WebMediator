@@ -64,6 +64,7 @@ public class WebMediatorClient : IWebMediatorClient, IDisposable
     public virtual async IAsyncEnumerable<SseItem<TResult>> EventStream<TResult>(Type requestType, object? request = null, [EnumeratorCancellation]CancellationToken cancellationToken = default)
     {
         var reconnections = 0U;
+        cancellationToken.ThrowIfCancellationRequested();
 
         while (!cancellationToken.IsCancellationRequested)
         {
@@ -77,9 +78,18 @@ public class WebMediatorClient : IWebMediatorClient, IDisposable
             {
                 await using var enumerator = ((IAsyncEnumerable<SseItem<TResult>>)result!).GetAsyncEnumerator(cancellationToken);
 
-                while (await enumerator.TrySafe(async x => await x.MoveNextAsync(), e => error = e))
+                while (true)
+                {
+                    var hasNext = await enumerator.TrySafe(async x => await x.MoveNextAsync(), e => error = e);
+                    cancellationToken.ThrowIfCancellationRequested();
+                    if (!hasNext)
+                        break;
+
                     yield return enumerator.Current;
+                }
             }
+
+            cancellationToken.ThrowIfCancellationRequested();
 
             if (reconnections >= EventStreamOptions.ReconnectionRetriesLimit)
                 throw new Exception($"The limit on the number of reconnection attempts has been reached. (RequestUri: {(await requestTask).RequestMessage?.RequestUri})", error);

@@ -53,7 +53,7 @@ public sealed class WebMediatorConfig
         return RegisterTypes(assemblies
             .Distinct()
             .SelectMany(x => x.GetTypes())
-            .Where(x => type.IsAbstract && type.IsAssignableFrom(x)));
+            .Where(x => !x.IsAbstract && type.IsAssignableFrom(x)));
     }
 
     public WebMediatorConfig RegisterNotAbstractTypesFromAssembly(Assembly assembly)

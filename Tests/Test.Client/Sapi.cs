@@ -12,6 +12,7 @@ namespace Test.Client
 
 
         [Test]
+        [Description("Verifies that a string payload is round-tripped without modification through the SAPI endpoint.")]
         public async Task TestString()
         {
             var request = "test";
@@ -21,6 +22,7 @@ namespace Test.Client
         }
 
         [Test]
+        [Description("Verifies that an integer payload is delivered back unchanged through the SAPI endpoint.")]
         public async Task TestInt()
         {
             var request = 555;
@@ -30,6 +32,7 @@ namespace Test.Client
         }
 
         [Test]
+        [Description("Verifies that nullable values round-trip correctly and null values remain null across the SAPI endpoint.")]
         public async Task TestNullable()
         {
             var request = (long?)777;
@@ -44,6 +47,7 @@ namespace Test.Client
         }
 
         [Test]
+        [Description("Verifies that DateTime values are serialized and deserialized without losing their expected value.")]
         public async Task TestDateTime()
         {
             var request = DateTime.Now;
