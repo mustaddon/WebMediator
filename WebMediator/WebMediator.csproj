@@ -1,15 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-  	<TargetFrameworks>net10.0</TargetFrameworks>
+  	<TargetFrameworks>net10.0;net11.0</TargetFrameworks>
   	<LangVersion>latest</LangVersion>
   	<Nullable>enable</Nullable>
   	<ImplicitUsings>enable</ImplicitUsings>
     <SignAssembly>True</SignAssembly>
   	<AssemblyOriginatorKeyFile>..\WebMediator.snk</AssemblyOriginatorKeyFile>
-  	<AssemblyVersion>1.0.5</AssemblyVersion>
-  	<FileVersion>1.0.5</FileVersion>
-  	<Version>1.0.5</Version>
+  	<AssemblyVersion>1.0.6</AssemblyVersion>
+  	<FileVersion>1.0.6</FileVersion>
+  	<Version>1.0.6</Version>
   	<Company></Company>
   	<Authors>Leonid Salavatov</Authors>
   	<Copyright>Leonid Salavatov 2026</Copyright>
